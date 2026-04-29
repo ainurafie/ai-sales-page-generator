@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\MarkdownHelper;
 use App\Http\Requests\StoreSalesPageRequest;
 use App\Models\SalesPage;
 use App\Services\OpenRouterService;
@@ -64,9 +63,13 @@ class SalesPageController extends Controller
     {
         $this->authorize('view', $salesPage);
 
-        $renderedContent = MarkdownHelper::toHtml($salesPage->generated_content ?? '');
+        $content = json_decode($salesPage->generated_content ?? '', true);
 
-        return view('sales-pages.show', compact('salesPage', 'renderedContent'));
+        if (!is_array($content)) {
+            $content = null;
+        }
+
+        return view('sales-pages.show', compact('salesPage', 'content'));
     }
 
     public function destroy(SalesPage $salesPage)
