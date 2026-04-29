@@ -25,6 +25,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/sales-pages/{salesPage}', [SalesPageController::class, 'show'])
         ->name('sales-pages.show');
 
+    Route::get('/sales-pages/{salesPage}/export', [SalesPageController::class, 'export'])
+        ->name('sales-pages.export');
+
     Route::delete('/sales-pages/{salesPage}', [SalesPageController::class, 'destroy'])
         ->name('sales-pages.destroy');
 

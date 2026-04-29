@@ -72,6 +72,28 @@ class SalesPageController extends Controller
         return view('sales-pages.show', compact('salesPage', 'content'));
     }
 
+    public function export(SalesPage $salesPage)
+    {
+        $this->authorize('view', $salesPage);
+
+        $content = json_decode($salesPage->generated_content ?? '', true);
+
+        if (!is_array($content)) {
+            return back()->withErrors([
+                'export' => 'Konten tidak valid untuk di-export.',
+            ]);
+        }
+
+        $html = view('sales-pages.export', compact('salesPage', 'content'))->render();
+
+        $filename = \Illuminate\Support\Str::slug($salesPage->product_name) . '.html';
+
+        return response($html, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
     public function destroy(SalesPage $salesPage)
     {
         $this->authorize('delete', $salesPage);
