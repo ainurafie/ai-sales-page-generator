@@ -242,8 +242,12 @@
             const submitBtn = document.getElementById('submitBtn');
             const submitSpinner = document.getElementById('submitSpinner');
             const submitLabel = document.getElementById('submitLabel');
+            let isSubmitting = false;
 
             form.addEventListener('submit', function () {
+                // Mark as submitting so beforeunload does NOT trigger on the redirect
+                isSubmitting = true;
+
                 // Disable button and show spinner inside button
                 submitBtn.disabled = true;
                 submitSpinner.classList.remove('hidden');
@@ -284,8 +288,11 @@
                 }, 5000);
             });
 
-            // Warn if user tries to leave page during generation
+            // Warn if user tries to leave page during generation (but NOT during normal form submit)
             window.addEventListener('beforeunload', function (e) {
+                if (isSubmitting) {
+                    return; // Allow the form's normal redirect
+                }
                 if (!overlay.classList.contains('hidden')) {
                     e.preventDefault();
                     e.returnValue = '';

@@ -104,6 +104,22 @@ class OpenRouterService
             // Clean content from markdown code fences if AI wraps JSON in ```json ... ```
             $content = $this->stripCodeFence($content);
 
+            // Validate that content is valid JSON
+            $parsed = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($parsed)) {
+                Log::warning('OpenRouter Invalid JSON', [
+                    'content' => $content,
+                    'json_error' => json_last_error_msg(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'AI menghasilkan JSON yang tidak valid. Coba generate ulang atau ganti model di .env (OPENROUTER_MODEL).',
+                    'content' => null,
+                    'raw_content' => $content,
+                ];
+            }
+
             return [
                 'success' => true,
                 'message' => 'Sales page berhasil dibuat.',
